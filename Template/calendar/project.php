@@ -12,14 +12,13 @@
     'controller' => 'DueCalendarController',
     'action' => 'project',
     'base_params' => $base,
-    'month_start' => $month_start,
-    'grid' => $grid,
+    'calendar' => $calendar,
     'tasks_by_day' => $tasks_by_day,
     'colors' => $colors,
     'show_project' => false,
     'toolbar' => $this->url->link(
         $includesClosed ? t('Hide closed tasks') : t('Include closed tasks'),
         'DueCalendarController', 'project',
-        array_merge($base, array('search' => $toggleSearch, 'month' => date('Y-m', $month_start)))
+        array_merge($base, array('search' => $toggleSearch, 'date' => $calendar['anchor'], 'view' => $calendar['view']))
     ),
 )) ?>

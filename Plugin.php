@@ -19,15 +19,18 @@ class Plugin extends Base
         // 대시보드 사이드바 (내 전체 프로젝트 배포 캘린더)
         $this->template->hook->attach('template:dashboard:sidebar', 'DueCalendar:dashboard/sidebar');
 
+        // 설정 사이드바 (주 시작 요일 / 기본 보기)
+        $this->template->hook->attach('template:config:sidebar', 'DueCalendar:config/sidebar');
+
         $this->hook->on('template:layout:css', array('template' => 'plugins/DueCalendar/Assets/css/due-calendar.css'));
 
         $this->route->addRoute('/release-calendar/project/:project_id', 'DueCalendarController', 'project', 'DueCalendar');
-        $this->route->addRoute('/release-calendar/project/:project_id/:month', 'DueCalendarController', 'project', 'DueCalendar');
         $this->route->addRoute('/release-calendar', 'DueCalendarController', 'dashboard', 'DueCalendar');
-        $this->route->addRoute('/release-calendar/all/:month', 'DueCalendarController', 'dashboard', 'DueCalendar');
+        $this->route->addRoute('/settings/release-calendar', 'DueCalendarConfigController', 'show', 'DueCalendar');
 
         $this->projectAccessMap->add('DueCalendarController', 'project', Role::PROJECT_VIEWER);
         $this->applicationAccessMap->add('DueCalendarController', 'dashboard', Role::APP_USER);
+        $this->applicationAccessMap->add('DueCalendarConfigController', '*', Role::APP_ADMIN);
     }
 
     public function onStartup()
@@ -61,7 +64,7 @@ class Plugin extends Base
 
     public function getPluginVersion()
     {
-        return '1.0.0';
+        return '1.1.0';
     }
 
     public function getPluginHomepage()

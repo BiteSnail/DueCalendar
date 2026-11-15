@@ -10,7 +10,8 @@
     <input type="hidden" name="action" value="dashboard">
     <input type="hidden" name="plugin" value="DueCalendar">
     <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-    <input type="hidden" name="month" value="<?= date('Y-m', $month_start) ?>">
+    <input type="hidden" name="date" value="<?= $calendar['anchor'] ?>">
+    <input type="hidden" name="view" value="<?= $calendar['view'] ?>">
     <select name="filter_project_id" onchange="this.form.submit()">
         <option value="0"><?= t('All projects') ?></option>
         <?php foreach ($projects as $id => $name): ?>
@@ -30,8 +31,7 @@
     'controller' => 'DueCalendarController',
     'action' => 'dashboard',
     'base_params' => $base,
-    'month_start' => $month_start,
-    'grid' => $grid,
+    'calendar' => $calendar,
     'tasks_by_day' => $tasks_by_day,
     'colors' => $colors,
     'show_project' => $filter_project_id == 0,

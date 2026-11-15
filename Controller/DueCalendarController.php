@@ -13,14 +13,24 @@ use Kanboard\Filter\TaskProjectFilter;
 class DueCalendarController extends BaseController
 {
     /**
+     * 공통: 보기 모드/기준일/그리드 계산
+     */
+    private function getCalendar()
+    {
+        $view = $this->dueCalendarModel->resolveView($this->request->getStringParam('view'));
+        $anchor = $this->dueCalendarModel->resolveDate($this->request->getStringParam('date'), $this->request->getStringParam('month'));
+
+        return $this->dueCalendarModel->buildCalendar($view, $anchor, $this->dueCalendarModel->getWeekStart());
+    }
+
+    /**
      * 프로젝트 배포 캘린더 - 상단 검색 필터(status:, assignee:, category: ...)를 그대로 사용
      */
     public function project()
     {
         $project = $this->getProject();
         $search = $this->helper->projectHeader->getSearchQuery($project);
-        $monthStart = $this->dueCalendarModel->parseMonth($this->request->getStringParam('month'));
-        $grid = $this->dueCalendarModel->buildGrid($monthStart);
+        $calendar = $this->getCalendar();
 
         $query = $this->taskLexer
             ->build($search)
@@ -32,9 +42,8 @@ class DueCalendarController extends BaseController
             'title' => $project['name'],
             'description' => $this->helper->projectHeader->getDescription($project),
             'search' => $search,
-            'month_start' => $monthStart,
-            'grid' => $grid,
-            'tasks_by_day' => $this->dueCalendarModel->getTasksByDueDate($query, $grid['start'], $grid['end']),
+            'calendar' => $calendar,
+            'tasks_by_day' => $this->dueCalendarModel->getTasksByDueDate($query, $calendar['start'], $calendar['end']),
             'colors' => $this->colorModel->getDefaultColors(),
         )));
     }
@@ -45,8 +54,7 @@ class DueCalendarController extends BaseController
     public function dashboard()
     {
         $user = $this->getUser();
-        $monthStart = $this->dueCalendarModel->parseMonth($this->request->getStringParam('month'));
-        $grid = $this->dueCalendarModel->buildGrid($monthStart);
+        $calendar = $this->getCalendar();
         $projectId = $this->request->getIntegerParam('filter_project_id');
         $status = $this->request->getStringParam('status', 'all');
 
@@ -59,9 +67,8 @@ class DueCalendarController extends BaseController
         $this->response->html($this->helper->layout->dashboard('DueCalendar:calendar/dashboard', array(
             'title' => t('Release calendar'),
             'user' => $user,
-            'month_start' => $monthStart,
-            'grid' => $grid,
-            'tasks_by_day' => $this->dueCalendarModel->getTasksByDueDate($query, $grid['start'], $grid['end']),
+            'calendar' => $calendar,
+            'tasks_by_day' => $this->dueCalendarModel->getTasksByDueDate($query, $calendar['start'], $calendar['end']),
             'colors' => $this->colorModel->getDefaultColors(),
             'projects' => $this->projectUserRoleModel->getActiveProjectsByUser($user['id']),
             'filter_project_id' => $projectId,
